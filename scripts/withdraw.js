@@ -14,8 +14,27 @@ async function main(){
       "goerli",
       process.env.GOERLI_API_KEY
     );
-
     const signer = new hre.ethers.Wallet(process.env.PRIVATE_KEY, provider)
+    const buyMeACoffee = new hre.ethers.Wallet(process.env.Wallet, provider)
     
+    console.log("current balance of owner: ", await getBalance(provider, signer.address),"ETH");
+    const contractBalance = await getBalance(provider, buyMeACoffee.address)
+    console.log("current balance of contract: ", await getBalance(provider, buyMeACoffee.address), "ETH");
+
+    if (contractBalance !=="0.0") {
+      console.log("withdrawing funds..");
+      const withdrawTxn = await buyMeACoffee.withdrawTips();
+      await withdrawTxn.wait()
+    } else{
+      console.log("No funds to withdraw");
+    }
+    console.log("current balance of owner: ", await getBalance(provider, signer.address), "ETH");
 
 }
+
+main()
+.then(()=> process.exit(0))
+.catch((error)=>{
+  console.error(error),
+  process.exit(1)
+});
